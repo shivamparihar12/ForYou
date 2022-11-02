@@ -148,6 +148,7 @@ public class FirstFragment extends Fragment {
 //            imageReader=ImageReader.newInstance(displayWidth,displayHeight, ImageFormat.FLEX_RGBA_8888,5);
 //            initRecorder();
             shareScreen();
+            Log.d(TAG,"starting ....");
         } else {
 //                mediaRecorder.stop();
 //            mediaRecorder.reset();
@@ -204,7 +205,7 @@ public class FirstFragment extends Fragment {
     public void getUserData() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String user_id = sharedPreferences.getString("USER_KEY", "");
-//        if (user_id != "") {
+        if (user_id != "") {
 
             Call<UserMeetDataList> meetDataListCall = RetrofitClient.getService().getUserData(new UserID(user_id));
             meetDataListCall.enqueue(new Callback<UserMeetDataList>() {
@@ -222,7 +223,7 @@ public class FirstFragment extends Fragment {
                     Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-//        }
+        }
 
     }
 
