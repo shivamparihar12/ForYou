@@ -38,7 +38,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.foryou.adapter.UserDataAdapter;
 import com.example.foryou.databinding.FragmentFirstBinding;
@@ -131,11 +130,11 @@ public class FirstFragment extends Fragment {
 
         //fetching user data
         getUserData();
-//        binding.refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//        binding.refreshLay.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 //            @Override
 //            public void onRefresh() {
 //                getUserData();
-//                binding.refreshLayout.setRefreshing(false);
+//                binding.refreshLay.setRefreshing(false);
 //            }
 //        });
 
@@ -148,7 +147,7 @@ public class FirstFragment extends Fragment {
 //            imageReader=ImageReader.newInstance(displayWidth,displayHeight, ImageFormat.FLEX_RGBA_8888,5);
 //            initRecorder();
             shareScreen();
-            Log.d(TAG,"starting ....");
+            Log.d(TAG, "starting ....");
         } else {
 //                mediaRecorder.stop();
 //            mediaRecorder.reset();

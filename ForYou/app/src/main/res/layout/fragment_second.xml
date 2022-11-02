@@ -3,36 +3,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SecondFragment"
-    android:orientation="vertical">
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".SecondFragment">
 
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:layout_margin="5dp"-->
-<!--        android:orientation="vertical">-->
+    <!--    <LinearLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:layout_margin="5dp"-->
+    <!--        android:orientation="vertical">-->
 
-<!--        <TextView-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginBottom="5dp"-->
-<!--            android:text="Overall Experience"-->
-<!--            android:textSize="14dp" />-->
+    <!--        <TextView-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginBottom="5dp"-->
+    <!--            android:text="Overall Experience"-->
+    <!--            android:textSize="14dp" />-->
 
-<!--        <com.github.mikephil.charting.charts.PieChart-->
-<!--            android:id="@+id/pie_chart"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_margin="10dp" />-->
-<!--    </LinearLayout>-->
+    <!--        <com.github.mikephil.charting.charts.PieChart-->
+    <!--            android:id="@+id/pie_chart"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:layout_margin="10dp" />-->
+    <!--    </LinearLayout>-->
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/pie_chart"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_margin="10dp" />
+
     <com.github.mikephil.charting.charts.LineChart
-        android:layout_width="match_parent"
         android:id="@+id/line_chart"
-        android:layout_height="300dp"/>
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
 
 </LinearLayout>
