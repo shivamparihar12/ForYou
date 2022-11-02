@@ -85,7 +85,9 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.refresh) {
             FragmentManager manager = getSupportFragmentManager();
             FirstFragment fragment = (FirstFragment) manager.findFragmentById(R.id.FirstFragment);
-            fragment.getUserData();
+            if (fragment != null) {
+                fragment.getUserData();
+            }
         }
 
         return super.onOptionsItemSelected(item);
