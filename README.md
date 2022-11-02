@@ -21,6 +21,7 @@ We save these emotion attributes to the user's database on our backend. The user
 
 <p><img src="https://github.com/shivamparihar12/ForYou/blob/main/images/saved%20user%20files.jpeg" width="250" height="550" />
 <img src="https://github.com/shivamparihar12/ForYou/blob/main/images/data%20visualisation.jpeg" width="250" height="550" />
+<img src="https://github.com/shivamparihar12/ForYou/blob/main/images/data%20visualization.gif" width="250" height="550" />
 
 # Other Functionalities
 Register Page: <br>
