@@ -3,8 +3,11 @@ package com.example.foryou;
 import static android.app.Activity.RESULT_OK;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.hardware.display.DisplayManager;
@@ -17,37 +20,53 @@ import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.preference.PreferenceManager;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.foryou.adapter.UserDataAdapter;
 import com.example.foryou.databinding.FragmentFirstBinding;
+import com.example.foryou.retrofit.RetrofitClient;
+import com.example.foryou.retrofit.retrofitmodel.UploadMeetDataModel;
+import com.example.foryou.retrofit.retrofitmodel.UserID;
+import com.example.foryou.retrofit.retrofitmodel.UserMeetData;
+import com.example.foryou.retrofit.retrofitmodel.UserMeetDataList;
 import com.example.foryou.utility.ConvertImageToBitmap;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FirstFragment extends Fragment {
-
 
     private FragmentFirstBinding binding;
     private static final String TAG = "MainActivity";
     private int mScreenDensity;
     private static final int REQUEST_CODE = 1010;
-//    private static final int REQUEST_PERMISSION = 10001;
     private static final int displayHeight = 1280, displayWidth = 720;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private FaceEmotionAttributesRecognition faceEmotionAttributesRecognition;
@@ -61,7 +80,10 @@ public class FirstFragment extends Fragment {
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
     private String videoUri = "";
-    private ArrayList<Float> arrayOfEmotionAttribute;
+    private ArrayList<String> arrayOfEmotionAttribute;
+    private ArrayList<UserMeetData> userMeetDataArrayList;
+    private UserDataAdapter userDataAdapter;
+
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -73,10 +95,7 @@ public class FirstFragment extends Fragment {
 
     @SuppressLint("WrongConstant")
     @Override
-    public View onCreateView(
-            LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState
-    ) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentFirstBinding.inflate(inflater, container, false);
         imageReader = ImageReader.newInstance(displayWidth, displayHeight, PixelFormat.RGBA_8888, 1);
@@ -98,7 +117,8 @@ public class FirstFragment extends Fragment {
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         mScreenDensity = metrics.densityDpi;
         mediaRecorder = new MediaRecorder();
-        arrayOfEmotionAttribute=new ArrayList<>();
+        arrayOfEmotionAttribute = new ArrayList<>();
+        userMeetDataArrayList = new ArrayList<>();
 
         mediaProjectionManager = (MediaProjectionManager) getActivity().getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         binding.toggleButton.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +127,10 @@ public class FirstFragment extends Fragment {
                 onToggleScreenShare(view);
             }
         });
+
+        //fetching user data
+        getUserData();
+
 
     }
 
@@ -117,12 +141,84 @@ public class FirstFragment extends Fragment {
 //            initRecorder();
             shareScreen();
         } else {
-            if (mediaRecorder != null)
 //                mediaRecorder.stop();
 //            mediaRecorder.reset();
-                Log.v(TAG, "Stopiing Recording");
+
+            Log.v(TAG, "Stopped Recording");
             stopScreenSharing();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Title");
+
+            final EditText input = new EditText(getActivity());
+            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            builder.setView(input);
+
+            // Set up the buttons
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    uploadRecordData(arrayOfEmotionAttribute, input.getText().toString());
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
         }
+    }
+
+    private void uploadRecordData(ArrayList<String> arrayOfEmotionAttribute, String title) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String userID = sharedPreferences.getString("USER_KEY", "");
+        UploadMeetDataModel model = new UploadMeetDataModel(arrayOfEmotionAttribute, userID, getCurrentDate(), title);
+
+        Call<Pair<String, String>> call = RetrofitClient.getService().uploadMeetData(model);
+        call.enqueue(new Callback<Pair<String, String>>() {
+            @Override
+            public void onResponse(Call<Pair<String, String>> call, Response<Pair<String, String>> response) {
+                Log.d(TAG, response.message());
+                Toast.makeText(getActivity(), response.message(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<Pair<String, String>> call, Throwable t) {
+                Log.d(TAG, t.getMessage());
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void getUserData() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String user_id = sharedPreferences.getString("USER_KEY", "");
+
+        Call<UserMeetDataList> meetDataListCall = RetrofitClient.getService().getUserData(new UserID(user_id));
+        meetDataListCall.enqueue(new Callback<UserMeetDataList>() {
+            @Override
+            public void onResponse(Call<UserMeetDataList> call, Response<UserMeetDataList> response) {
+                userMeetDataArrayList.addAll(response.body().getUserMeetDataArrayList());
+                userDataAdapter = new UserDataAdapter(getActivity(), FirstFragment.this,userMeetDataArrayList);
+                binding.recyclerView.setAdapter(userDataAdapter);
+                binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            }
+
+            @Override
+            public void onFailure(Call<UserMeetDataList> call, Throwable t) {
+                Log.d(TAG, t.getMessage());
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    public String getCurrentDate() {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z", Locale.getDefault());
+        return simpleDateFormat.format(new Date());
     }
 
     private void shareScreen() {
@@ -131,7 +227,6 @@ public class FirstFragment extends Fragment {
             return;
         }
         virtualDisplay = createVirtualDisplay();
-//        mediaRecorder.start();
     }
 
 
@@ -191,8 +286,7 @@ public class FirstFragment extends Fragment {
     }
 
     private void stopScreenSharing() {
-        if (virtualDisplay == null)
-            return;
+        if (virtualDisplay == null) return;
         virtualDisplay.release();
         destroyMediaProjection();
     }
@@ -207,23 +301,19 @@ public class FirstFragment extends Fragment {
     }
 
     private VirtualDisplay createVirtualDisplay() {
-        return mediaProjection.createVirtualDisplay(TAG,
-                displayWidth, displayHeight, mScreenDensity,
-                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-                imageReader.getSurface(),
-                new VirtualDisplay.Callback() {
-                    @Override
-                    public void onPaused() {
-                        Log.i(TAG, "onPaused");
-                        super.onPaused();
-                    }
+        return mediaProjection.createVirtualDisplay(TAG, displayWidth, displayHeight, mScreenDensity, DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, imageReader.getSurface(), new VirtualDisplay.Callback() {
+            @Override
+            public void onPaused() {
+                Log.i(TAG, "onPaused");
+                super.onPaused();
+            }
 
-                    @Override
-                    public void onResumed() {
-                        Log.i(TAG, "onResumed");
-                        super.onResumed();
-                    }
-                }, null/*handler*/);
+            @Override
+            public void onResumed() {
+                Log.i(TAG, "onResumed");
+                super.onResumed();
+            }
+        }, null/*handler*/);
     }
 
     private void startBackgroundThread() {
@@ -246,7 +336,6 @@ public class FirstFragment extends Fragment {
             e.printStackTrace();
         }
     }
-
 
 
     @Override

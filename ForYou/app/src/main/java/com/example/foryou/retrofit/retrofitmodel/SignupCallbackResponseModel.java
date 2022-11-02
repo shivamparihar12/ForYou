@@ -3,6 +3,9 @@ package com.example.foryou.retrofit.retrofitmodel;
 import com.google.gson.annotations.SerializedName;
 
 public class SignupCallbackResponseModel {
+//    @SerializedName("data")
+//    private ArrayList<SignupCallbackResponseModel>  signupCallbackResponseModelArrayList;
+
     @SerializedName("name")
     private String name;
 
@@ -12,7 +15,7 @@ public class SignupCallbackResponseModel {
     @SerializedName("password")
     private String password;
 
-    @SerializedName("__id")
+    @SerializedName("_id")
     private String userID;
 
     @SerializedName("__v")
@@ -25,6 +28,10 @@ public class SignupCallbackResponseModel {
         this.userID = userID;
         this.__v = __v;
     }
+
+//    public SignupCallbackResponseModel(ArrayList<SignupCallbackResponseModel> signupCallbackResponseModelArrayList){
+//        this.signupCallbackResponseModelArrayList=signupCallbackResponseModelArrayList;
+//    }
 
     public String getName() {
         return name;

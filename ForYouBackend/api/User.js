@@ -3,6 +3,7 @@ const router=express.Router()
 
 //mongodb user model
 const User=require('./../models/User')
+let userResponse=require('./../models/userResponseData')
 const bcrypt=require('bcrypt')
 
 //signup
@@ -105,11 +106,12 @@ router.post('/signin',(req,res)=>{
                 const hashedPassword=data[0].password
                 bcrypt.compare(password,hashedPassword).then(result=>{
                     if(result){
-                        res.json({
+                        // res.json({
                             // status:"SUCCESS",
                             // message:"Signin successful",
-                            data:data
-                        })
+                            userResponse=data[0]
+                            return res.status(200).json({data})
+                        // })
                     }
                     else{
                         res.json({

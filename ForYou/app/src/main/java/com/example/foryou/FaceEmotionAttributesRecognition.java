@@ -79,7 +79,7 @@ public class FaceEmotionAttributesRecognition {
     }
 
     public ArrayList recognizeImage(Mat matImage) {
-        ArrayList<Float> array=new ArrayList<>();
+        ArrayList<String> array=new ArrayList<>();
         Core.flip(matImage.t(), matImage, 1);
         Mat grayScaleImage = new Mat();
         Imgproc.cvtColor(matImage, grayScaleImage, Imgproc.COLOR_RGBA2GRAY);
@@ -114,8 +114,9 @@ public class FaceEmotionAttributesRecognition {
             float[][] emotion = new float[1][1];
             interpreter.run(byteBuffer, emotion);
             float emotionFloatVal=(float)Array.get(Array.get(emotion, 0), 0);
-            array.add(emotionFloatVal);
-            Log.d(TAG, "output: " + emotionFloatVal+" "+getEmotionLabel(emotionFloatVal));
+            String emoLabel=getEmotionLabel(emotionFloatVal);
+            array.add(emoLabel);
+            Log.d(TAG, "output: " + emotionFloatVal+" "+emoLabel);
         }
 
         Core.flip(matImage.t(), matImage, 0);

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -11,9 +12,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.foryou.databinding.ActivitySignUpBinding;
 import com.example.foryou.retrofit.RetrofitClient;
+import com.example.foryou.retrofit.retrofitmodel.SignData;
 import com.example.foryou.retrofit.retrofitmodel.SignInRequestModel;
 import com.example.foryou.retrofit.retrofitmodel.SignupCallbackResponseModel;
 import com.example.foryou.retrofit.retrofitmodel.UserSignUpModel;
+
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -104,45 +108,86 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void SignInUser(SignInRequestModel signInRequestModel) {
-        Call<SignupCallbackResponseModel> signInUser = RetrofitClient.getService().signInUser(signInRequestModel);
-        signInUser.enqueue(new Callback<SignupCallbackResponseModel>() {
+        Call<SignData> signInUser = RetrofitClient.getService().signInUser(signInRequestModel);
+        signInUser.enqueue(new Callback<SignData>() {
             @Override
-            public void onResponse(Call<SignupCallbackResponseModel> call, Response<SignupCallbackResponseModel> response) {
-                SignupCallbackResponseModel signupCallbackResponseModel = response.body();
-                saveToSharedPref(signupCallbackResponseModel.getUserID());
+            public void onResponse(Call<SignData> call, Response<SignData> response) {
+                SignupCallbackResponseModel signupCallbackResponseModel = new SignupCallbackResponseModel(
+                        response.body().getSignupCallbackResponseModelList().get(0).getName(),
+                        response.body().getSignupCallbackResponseModelList().get(0).getEmail(),
+                        response.body().getSignupCallbackResponseModelList().get(0).getPassword(),
+                        response.body().getSignupCallbackResponseModelList().get(0).getUserID(),
+                        response.body().getSignupCallbackResponseModelList().get(0).get__v());
+
+                Log.d("USERID", "haha"+response.body().getSignupCallbackResponseModelList().get(0).getUserID());
+                saveToSharedPref(response.body().getSignupCallbackResponseModelList().get(0).getUserID());
                 startActivity(new Intent(SignUpActivity.this, MainActivity.class));
-//                onDestroy();
             }
 
             @Override
-            public void onFailure(Call<SignupCallbackResponseModel> call, Throwable t) {
-                Toast.makeText(SignUpActivity.this, t.getMessage().toString(), Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<SignData> call, Throwable t) {
+                Toast.makeText(SignUpActivity.this, t.getMessage().toString(), Toast.LENGTH_LONG).show();
                 binding.signinEmail.setText("");
                 binding.signinPassword.setText("");
                 binding.signinEtRepassword.setText("");
             }
         });
+//        Call<SignupCallbackResponseModel> signInUser = RetrofitClient.getService().signInUser(signInRequestModel);
+//        signInUser.enqueue(new Callback<SignupCallbackResponseModel>() {
+//            @Override
+//            public void onResponse(Call<SignupCallbackResponseModel> call, Response<SignupCallbackResponseModel> response) {
+//                SignupCallbackResponseModel signupCallbackResponseModel = response.body();
+//                Log.d("signin log",response.body().getName());
+////                saveToSharedPref(signupCallbackResponseModel.getUserID());
+//                startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+////                onDestroy();
+//            }
+//
+//            @Override
+//            public void onFailure(Call<SignupCallbackResponseModel> call, Throwable t) {
+//                Toast.makeText(SignUpActivity.this, t.getMessage().toString(), Toast.LENGTH_SHORT).show();
+//                binding.signinEmail.setText("");
+//                binding.signinPassword.setText("");
+//                binding.signinEtRepassword.setText("");
+//            }
+//        });
     }
 
 
     private void RegisterUser(UserSignUpModel userSignUpModel) {
-        Call<SignupCallbackResponseModel> registerUser = RetrofitClient.getService().registerUser(userSignUpModel);
-        registerUser.enqueue(new Callback<SignupCallbackResponseModel>() {
+        Call<ArrayList<SignupCallbackResponseModel>> registerUser = RetrofitClient.getService().registerUser(userSignUpModel);
+        registerUser.enqueue(new Callback<ArrayList<SignupCallbackResponseModel>>() {
             @Override
-            public void onResponse(Call<SignupCallbackResponseModel> call, Response<SignupCallbackResponseModel> response) {
-                SignupCallbackResponseModel signupCallbackResponseModel = response.body();
+            public void onResponse(Call<ArrayList<SignupCallbackResponseModel>> call, Response<ArrayList<SignupCallbackResponseModel>> response) {
+                SignupCallbackResponseModel signupCallbackResponseModel = response.body().get(0);
                 saveToSharedPref(signupCallbackResponseModel.getUserID());
                 startActivity(new Intent(SignUpActivity.this, MainActivity.class));
             }
 
             @Override
-            public void onFailure(Call<SignupCallbackResponseModel> call, Throwable t) {
+            public void onFailure(Call<ArrayList<SignupCallbackResponseModel>> call, Throwable t) {
                 Toast.makeText(SignUpActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                 binding.signinEmail.setText("");
                 binding.signinPassword.setText("");
                 binding.etName.setText("");
             }
         });
+//        registerUser.enqueue(new Callback<SignupCallbackResponseModel>() {
+//            @Override
+//            public void onResponse(Call<ArrayList<SignupCallbackResponseModel>> call, Response<ArrayList<SignupCallbackResponseModel>> response) {
+//                SignupCallbackResponseModel signupCallbackResponseModel = response[0].body();
+//                saveToSharedPref(signupCallbackResponseModel.getUserID());
+//                startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+//            }
+//
+//            @Override
+//            public void onFailure(Call<<SignupCallbackResponseModel>> call, Throwable t) {
+//                Toast.makeText(SignUpActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+//                binding.signinEmail.setText("");
+//                binding.signinPassword.setText("");
+//                binding.etName.setText("");
+//            }
+//        });
 
     }
 
