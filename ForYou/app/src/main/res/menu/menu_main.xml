@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.foryou.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/refresh"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="Refresh"
         app:showAsAction="never" />
 </menu>

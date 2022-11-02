@@ -59,8 +59,8 @@ router.post('/signup',(req,res)=>{
 
                     newUser.save().then(result=>{
                         res.json({
-                            status:"SUCCESS",
-                            messgae:"Signup successful",
+                            // status:"SUCCESS",
+                            // messgae:"Signup successful",
                             data:result
                         })
                     })

@@ -20,7 +20,7 @@ import retrofit2.http.POST;
 public interface ClientUserApi {
 
     @POST("/user/signup")
-    Call<ArrayList<SignupCallbackResponseModel>> registerUser(@Body UserSignUpModel userSignUpModel);
+    Call<SignupCallbackResponseModel> registerUser(@Body UserSignUpModel userSignUpModel);
 
     @POST("/user/signin")
     Call<SignData> signInUser(@Body SignInRequestModel signInRequestModel);

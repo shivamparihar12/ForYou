@@ -1,5 +1,6 @@
 package com.example.foryou;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import com.example.foryou.retrofit.retrofitmodel.SignData;
 import com.example.foryou.retrofit.retrofitmodel.SignInRequestModel;
 import com.example.foryou.retrofit.retrofitmodel.SignupCallbackResponseModel;
 import com.example.foryou.retrofit.retrofitmodel.UserSignUpModel;
+import com.example.foryou.utility.OnSwipeTouchListener;
 
 import java.util.ArrayList;
 
@@ -26,6 +28,7 @@ import retrofit2.Response;
 public class SignUpActivity extends AppCompatActivity {
     private ActivitySignUpBinding binding;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,22 +66,37 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
-        binding.registerSwipeLeft.setOnClickListener(new View.OnClickListener() {
+        //for registering user
+        binding.registerSwipeRight.setOnTouchListener(new OnSwipeTouchListener(SignUpActivity.this) {
             @Override
-            public void onClick(View view) {
+            public void onSwipeRight() {
                 binding.signupLayout.setVisibility(View.VISIBLE);
                 binding.signinLayout.setVisibility(View.GONE);
             }
         });
+//        binding.registerSwipeRight.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                binding.signupLayout.setVisibility(View.VISIBLE);
+//                binding.signinLayout.setVisibility(View.GONE);
+//            }
+//        });
 
         //for signing in
-        binding.swipeLeftLogin.setOnClickListener(new View.OnClickListener() {
+        binding.swipeLeftLogin.setOnTouchListener(new OnSwipeTouchListener(SignUpActivity.this) {
             @Override
-            public void onClick(View view) {
+            public void onSwipeLeft() {
                 binding.signupLayout.setVisibility(View.GONE);
                 binding.signinLayout.setVisibility(View.VISIBLE);
             }
         });
+//        binding.swipeLeftLogin.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                binding.signupLayout.setVisibility(View.GONE);
+//                binding.signinLayout.setVisibility(View.VISIBLE);
+//            }
+//        });
 
         binding.buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,7 +137,7 @@ public class SignUpActivity extends AppCompatActivity {
                         response.body().getSignupCallbackResponseModelList().get(0).getUserID(),
                         response.body().getSignupCallbackResponseModelList().get(0).get__v());
 
-                Log.d("USERID", "haha"+response.body().getSignupCallbackResponseModelList().get(0).getUserID());
+                Log.d("USERID", "haha" + response.body().getSignupCallbackResponseModelList().get(0).getUserID());
                 saveToSharedPref(response.body().getSignupCallbackResponseModelList().get(0).getUserID());
                 startActivity(new Intent(SignUpActivity.this, MainActivity.class));
             }
@@ -155,23 +173,35 @@ public class SignUpActivity extends AppCompatActivity {
 
 
     private void RegisterUser(UserSignUpModel userSignUpModel) {
-        Call<ArrayList<SignupCallbackResponseModel>> registerUser = RetrofitClient.getService().registerUser(userSignUpModel);
-        registerUser.enqueue(new Callback<ArrayList<SignupCallbackResponseModel>>() {
+        Call<SignupCallbackResponseModel> registerUser = RetrofitClient.getService().registerUser(userSignUpModel);
+        registerUser.enqueue(new Callback<SignupCallbackResponseModel>() {
             @Override
-            public void onResponse(Call<ArrayList<SignupCallbackResponseModel>> call, Response<ArrayList<SignupCallbackResponseModel>> response) {
-                SignupCallbackResponseModel signupCallbackResponseModel = response.body().get(0);
+            public void onResponse(Call<SignupCallbackResponseModel> call, Response<SignupCallbackResponseModel> response) {
+                SignupCallbackResponseModel signupCallbackResponseModel = response.body();
                 saveToSharedPref(signupCallbackResponseModel.getUserID());
                 startActivity(new Intent(SignUpActivity.this, MainActivity.class));
             }
 
             @Override
-            public void onFailure(Call<ArrayList<SignupCallbackResponseModel>> call, Throwable t) {
+            public void onFailure(Call<SignupCallbackResponseModel> call, Throwable t) {
                 Toast.makeText(SignUpActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                binding.signinEmail.setText("");
-                binding.signinPassword.setText("");
+                binding.etRepassword.setText("");
+                binding.etName.setText("");
+                binding.etRepassword.setText("");
                 binding.etName.setText("");
             }
         });
+//        registerUser.enqueue(new Callback<ArrayList<SignupCallbackResponseModel>>() {
+//            @Override
+//            public void onResponse(Call<ArrayList<SignupCallbackResponseModel>> call, Response<ArrayList<SignupCallbackResponseModel>> response) {
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ArrayList<SignupCallbackResponseModel>> call, Throwable t) {
+//
+//            }
+//        });
 //        registerUser.enqueue(new Callback<SignupCallbackResponseModel>() {
 //            @Override
 //            public void onResponse(Call<ArrayList<SignupCallbackResponseModel>> call, Response<ArrayList<SignupCallbackResponseModel>> response) {

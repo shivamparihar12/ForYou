@@ -38,6 +38,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.foryou.adapter.UserDataAdapter;
 import com.example.foryou.databinding.FragmentFirstBinding;
@@ -130,6 +131,13 @@ public class FirstFragment extends Fragment {
 
         //fetching user data
         getUserData();
+//        binding.refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                getUserData();
+//                binding.refreshLayout.setRefreshing(false);
+//            }
+//        });
 
 
     }
@@ -151,7 +159,7 @@ public class FirstFragment extends Fragment {
             builder.setTitle("Title");
 
             final EditText input = new EditText(getActivity());
-            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
             builder.setView(input);
 
             // Set up the buttons
@@ -196,23 +204,25 @@ public class FirstFragment extends Fragment {
     public void getUserData() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String user_id = sharedPreferences.getString("USER_KEY", "");
+//        if (user_id != "") {
 
-        Call<UserMeetDataList> meetDataListCall = RetrofitClient.getService().getUserData(new UserID(user_id));
-        meetDataListCall.enqueue(new Callback<UserMeetDataList>() {
-            @Override
-            public void onResponse(Call<UserMeetDataList> call, Response<UserMeetDataList> response) {
-                userMeetDataArrayList.addAll(response.body().getUserMeetDataArrayList());
-                userDataAdapter = new UserDataAdapter(getActivity(), FirstFragment.this,userMeetDataArrayList);
-                binding.recyclerView.setAdapter(userDataAdapter);
-                binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            }
+            Call<UserMeetDataList> meetDataListCall = RetrofitClient.getService().getUserData(new UserID(user_id));
+            meetDataListCall.enqueue(new Callback<UserMeetDataList>() {
+                @Override
+                public void onResponse(Call<UserMeetDataList> call, Response<UserMeetDataList> response) {
+                    userMeetDataArrayList.addAll(response.body().getUserMeetDataArrayList());
+                    userDataAdapter = new UserDataAdapter(getActivity(), FirstFragment.this, userMeetDataArrayList);
+                    binding.recyclerView.setAdapter(userDataAdapter);
+                    binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                }
 
-            @Override
-            public void onFailure(Call<UserMeetDataList> call, Throwable t) {
-                Log.d(TAG, t.getMessage());
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure(Call<UserMeetDataList> call, Throwable t) {
+                    Log.d(TAG, t.getMessage());
+                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+//        }
 
     }
 
