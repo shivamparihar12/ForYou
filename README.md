@@ -1,10 +1,3 @@
-# Applicant Info
-
-NAME - SHIVAM PARIHAR <br>
-UNIVERSITY - Indian Institute of Technology, Patna <br>
-DEPARTMENT - Electrical and Electronics Engineering
-
-
 # ForYou
 ForYou is an Android application to get real-time analysis of the emotions of the person you are in a meeting with on an online meeting platform such as google meet or Zoom.
 This app uses Mediaprojection to cast the screen to SurfaceView, from which we feed the data to the ImageReader. 
