@@ -1,11 +1,11 @@
 # ForYou
-ForYou is an Android application to get real-time analysis of the emotions of the person you are in a meeting with on an online meeting platform such as google meet or Zoom.
+ForYou is an Android application to get real-time analysis of the emotions of the person you are meeting with on an online platform such as Google Meets or Zoom.
 This app uses Mediaprojection to cast the screen to SurfaceView, from which we feed the data to the ImageReader. 
 Using ImageReader, you get frames on which, using the emotion analysis model, we get emotion attributes.
 
 I have used this publically available already trained model https://www.kaggle.com/datasets/pramod722445/model300
 
-I have Deployed the AI model using TensorFlowlite on Frontend.
+I have Deployed the AI model using TensorFlowlite on this Android Application.
 I am using Nodejs and MongoDB for the backend.
 
 We save these emotion attributes to the user's database on our backend. The user has access to this database that he can use to analyze the whole meeting.
